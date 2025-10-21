@@ -16,7 +16,7 @@ pipeline {
             environment {
                 PROJECT_DIR = "/var/jenkins_home/workspace/CICDTest_Build/CICDTest"
                 BUILD_OUTPUT = "/var/jenkins_home/workspace/CICDTest_Build/BuildOutput/Linux"
-                UAT_PATH = "/home/danierumr/Documents/Projects/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
+                UAT_PATH = "/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
             }
             steps {
                 echo "Building Linux version..."
