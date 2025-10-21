@@ -12,7 +12,7 @@ pipeline {
 
         stage('Build on Linux') {
             agent { label 'linux' }
-            when { expression { return env.BUILD_ON_LINUX == 'true' } }
+            when { expression { isUnix() } }
             environment {
                 PROJECT_DIR = "/var/jenkins_home/workspace/CICDTest_Build/CICDTest"
                 BUILD_OUTPUT = "/var/jenkins_home/workspace/CICDTest_Build/BuildOutput/Linux"
@@ -39,7 +39,7 @@ pipeline {
 
         stage('Build on Windows') {
             agent { label 'windows' }
-            when { expression { return env.BUILD_ON_WINDOWS == 'true' } }
+            when { expression { !isUnix() } }
             environment {
                 PROJECT_DIR = "C:\\Jenkins\\workspace\\CICDTest_Build\\CICDTest"
                 BUILD_OUTPUT = "C:\\Jenkins\\workspace\\CICDTest_Build\\BuildOutput\\Windows"
