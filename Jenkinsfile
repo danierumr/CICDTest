@@ -6,6 +6,7 @@ pipeline {
         PROJECT_DIR = "${WORKSPACE}\\CICDTest"
         UAT_PATH = "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Build\\BatchFiles\\RunUAT.bat"
         BUILD_PATH = "${WORKSPACE}\\BuildOutput"
+        BUILD_VERSION = "${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -24,7 +25,7 @@ pipeline {
                     -project="%PROJECT_DIR%\\CICDTest.uproject" ^
                     -noP4 -platform=Win64 -clientconfig=Development ^
                     -cook -build -stage -pak -archive ^
-                    -archivedirectory="%BUILD_PATH%"
+                    -archivedirectory="%BUILD_PATH%\\Build_${BUILD_VERSION}"
                 '''
             }
         }
