@@ -1,8 +1,11 @@
 pipeline {
     agent none
+    options {
+        // prevent declarative from doing an automatic checkout that uses the wrong git
+        skipDefaultCheckout()
+    }
 
     stages {
-
         stage('Checkout and Build on Linux') {
             agent { label 'linux-unreal' }
             environment {
@@ -24,7 +27,6 @@ pipeline {
                     userRemoteConfigs: [[
                         url: 'https://github.com/danierumr/CICDTest.git',
                     ]]
-                    // removed gitTool here; PATH now points to the node's Git installation
                 ])
 
                 echo "Building Linux version..."
