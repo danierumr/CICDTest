@@ -2,6 +2,11 @@ pipeline {
     agent none
 
     stages {
+
+        stage('Checkout') {
+            checkout scm
+        }
+        
         stage('Build on Linux') {
             agent { label 'linux-unreal' }
             environment {
@@ -10,15 +15,6 @@ pipeline {
                 UAT_PATH = "/opt/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
             }
             steps {
-                echo "Checking out repo on Linux..."
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/danierumr/CICDTest.git']],
-                    extensions: [],
-                    gitTool: 'Git-Linux'
-                ])
-
                 echo "Building Linux version..."
                 sh '''
                     mkdir -p "$BUILD_OUTPUT"
@@ -48,13 +44,6 @@ pipeline {
             }
             steps {
                 echo "Checking out repo on Windows..."
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/danierumr/CICDTest.git']],
-                    extensions: [],
-                    gitTool: 'Git-Windows'
-                ])
 
                 echo "Building Windows version..."
                 bat """
