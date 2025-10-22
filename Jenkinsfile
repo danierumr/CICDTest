@@ -11,7 +11,7 @@ pipeline {
         }
 
         stage('Build on Linux') {
-            agent { label 'linux' }
+            agent { label 'linux-unreal' }
             when { expression { isUnix() } }
             environment {
                 PROJECT_DIR = "/var/jenkins_home/workspace/CICDTest_Build/CICDTest"
