@@ -1,7 +1,8 @@
 pipeline {
-    agent none   // define agent per stage
+    agent none
 
     stages {
+
         stage('Build on Linux') {
             agent { label 'linux-unreal' }
             environment {
@@ -11,7 +12,11 @@ pipeline {
             }
             steps {
                 echo "Checking out repo on Linux..."
-                checkout scm
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/danierumr/CICDTest.git']],
+                    gitTool: 'Git-Linux'
+                ])
 
                 echo "Building Linux version..."
                 sh '''
@@ -40,7 +45,11 @@ pipeline {
             }
             steps {
                 echo "Checking out repo on Windows..."
-                checkout scm
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/danierumr/CICDTest.git']],
+                    gitTool: 'Git-Windows'
+                ])
 
                 echo "Building Windows version..."
                 bat """
@@ -59,6 +68,7 @@ pipeline {
                 success { archiveArtifacts artifacts: 'BuildOutput/Windows/**/*', fingerprint: true }
             }
         }
+
     }
 
     post {
