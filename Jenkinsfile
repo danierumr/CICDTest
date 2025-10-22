@@ -2,27 +2,21 @@ pipeline {
     agent none   // define agent per stage
 
     stages {
-        stage('Checkout') {
-            agent any
-            steps {
-                echo "Checking out repo..."
-                checkout scm
-            }
-        }
-
         stage('Build on Linux') {
             agent { label 'linux-unreal' }
-            when { expression { isUnix() } }
             environment {
-                PROJECT_DIR = "/var/jenkins_home/workspace/CICDTest_Build/CICDTest"
-                BUILD_OUTPUT = "/var/jenkins_home/workspace/CICDTest_Build/BuildOutput/Linux"
-                UAT_PATH = "/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
+                PROJECT_DIR = "/home/builduser/workspace/CICDTest_Build/CICDTest"
+                BUILD_OUTPUT = "/home/builduser/workspace/CICDTest_Build/BuildOutput/Linux"
+                UAT_PATH = "/opt/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
             }
             steps {
+                echo "Checking out repo on Linux..."
+                checkout scm
+
                 echo "Building Linux version..."
                 sh '''
-                mkdir -p $BUILD_OUTPUT
-                $UAT_PATH BuildCookRun \
+                mkdir -p "$BUILD_OUTPUT"
+                "$UAT_PATH" BuildCookRun \
                     -project="$PROJECT_DIR/CICDTest.uproject" \
                     -noP4 \
                     -platform=Linux \
@@ -39,13 +33,15 @@ pipeline {
 
         stage('Build on Windows') {
             agent { label 'windows' }
-            when { expression { !isUnix() } }
             environment {
                 PROJECT_DIR = "C:\\Jenkins\\workspace\\CICDTest_Build\\CICDTest"
                 BUILD_OUTPUT = "C:\\Jenkins\\workspace\\CICDTest_Build\\BuildOutput\\Windows"
                 UAT_PATH = "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Build\\BatchFiles\\RunUAT.bat"
             }
             steps {
+                echo "Checking out repo on Windows..."
+                checkout scm
+
                 echo "Building Windows version..."
                 bat """
                 mkdir "$BUILD_OUTPUT"
