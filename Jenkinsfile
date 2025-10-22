@@ -3,11 +3,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            checkout scm
-        }
-        
-        stage('Build on Linux') {
+        stage('Checkout and Build on Linux') {
             agent { label 'linux-unreal' }
             environment {
                 PROJECT_DIR = "${env.WORKSPACE}/CICDTest"
@@ -15,6 +11,15 @@ pipeline {
                 UAT_PATH = "/opt/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
             }
             steps {
+                echo "Checking out repo on Linux..."
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/danierumr/CICDTest.git',
+                    ]],
+                    gitTool: 'Git-Linux'
+                ])
+
                 echo "Building Linux version..."
                 sh '''
                     mkdir -p "$BUILD_OUTPUT"
@@ -30,12 +35,12 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts artifacts: 'BuildOutput/Linux/**/*', fingerprint: true 
+                    archiveArtifacts artifacts: 'BuildOutput/Linux/**/*', fingerprint: true
                 }
             }
         }
 
-        stage('Build on Windows') {
+        stage('Checkout and Build on Windows') {
             agent { label 'windows' }
             environment {
                 PROJECT_DIR = "${env.WORKSPACE}\\CICDTest"
@@ -44,23 +49,30 @@ pipeline {
             }
             steps {
                 echo "Checking out repo on Windows..."
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/danierumr/CICDTest.git',
+                    ]],
+                    gitTool: 'Git-Windows'
+                ])
 
                 echo "Building Windows version..."
                 bat """
                     if not exist "${BUILD_OUTPUT}" mkdir "${BUILD_OUTPUT}"
-                    "${UAT_PATH}" BuildCookRun ^
-                        -project="${PROJECT_DIR}\\CICDTest.uproject" ^
-                        -noP4 ^
-                        -platform=Win64 ^
-                        -clientconfig=Development ^
-                        -serverconfig=Development ^
-                        -cook -build -stage -pak -archive ^
+                    "${UAT_PATH}" BuildCookRun ^ 
+                        -project="${PROJECT_DIR}\\CICDTest.uproject" ^ 
+                        -noP4 ^ 
+                        -platform=Win64 ^ 
+                        -clientconfig=Development ^ 
+                        -serverconfig=Development ^ 
+                        -cook -build -stage -pak -archive ^ 
                         -archivedirectory="${BUILD_OUTPUT}"
                 """
             }
             post {
                 success {
-                    archiveArtifacts artifacts: 'BuildOutput/Windows/**/*', fingerprint: true 
+                    archiveArtifacts artifacts: 'BuildOutput/Windows/**/*', fingerprint: true
                 }
             }
         }
