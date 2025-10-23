@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Checkout and Build on Linux') {
             agent { label 'linux-unreal' }
+            tools { git 'Git-Linux' }
             environment {
                 PROJECT_DIR = "${env.WORKSPACE}/CICDTest"
                 BUILD_OUTPUT = "${env.WORKSPACE}/BuildOutput/Linux"
@@ -35,6 +36,7 @@ pipeline {
 
         stage('Checkout and Build on Windows') {
             agent { label 'windows' }
+            tools { git 'Git-Windows' }
             environment {
                 PROJECT_DIR = "${env.WORKSPACE}\\CICDTest"
                 BUILD_OUTPUT = "${env.WORKSPACE}\\BuildOutput\\Windows"
