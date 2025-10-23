@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Checkout and Build on Linux') {
             agent { label 'linux-unreal' }
+            echo "Changing git tool to Git-Linux"
             tools { git 'Git-Linux' }
             environment {
                 PROJECT_DIR = "${env.WORKSPACE}/CICDTest"
@@ -36,6 +37,7 @@ pipeline {
 
         stage('Checkout and Build on Windows') {
             agent { label 'windows' }
+            echo "Changing git tool to Git-Windows"
             tools { git 'Git-Windows' }
             environment {
                 PROJECT_DIR = "${env.WORKSPACE}\\CICDTest"
