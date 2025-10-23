@@ -1,9 +1,5 @@
 pipeline {
     agent none
-    options {
-        // prevent declarative from doing an automatic checkout that uses the wrong git
-        skipDefaultCheckout()
-    }
 
     stages {
         stage('Checkout and Build on Linux') {
@@ -14,20 +10,8 @@ pipeline {
                 UAT_PATH = "/opt/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
             }
             steps {
-                echo "Ensuring node-specific Git is used on Linux..."
-                script {
-                    // resolve the Git tool configured in Jenkins for the Linux node
-                    def gitHome = tool name: 'Git-Linux', type: 'git'
-                    env.PATH = "${gitHome}/bin:${env.PATH}"
-                }
-
-                echo "Checking out repo on Linux..."
-                checkout([$class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/danierumr/CICDTest.git',
-                    ]]
-                ])
+                echo "Pulling latest code from GitHub..."
+                checkout scm
 
                 echo "Building Linux version..."
                 sh '''
@@ -57,22 +41,8 @@ pipeline {
                 UAT_PATH = "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Build\\BatchFiles\\RunUAT.bat"
             }
             steps {
-                echo "Ensuring node-specific Git is used on Windows..."
-                script {
-                    // resolve the Git tool configured in Jenkins for the Windows node
-                    def gitHome = tool name: 'Git-Windows', type: 'git'
-                    // prepend the git bin directory to PATH so checkout uses the node's Git
-                    env.PATH = "${gitHome}\\bin;${env.PATH}"
-                }
-
-                echo "Checking out repo on Windows..."
-                checkout([$class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/danierumr/CICDTest.git',
-                    ]]
-                    // removed gitTool here; PATH now points to the node's Git installation
-                ])
+                echo "Pulling latest code from GitHub..."
+                checkout scm
 
                 echo "Building Windows version..."
                 bat """
